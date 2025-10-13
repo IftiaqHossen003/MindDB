@@ -47,6 +47,16 @@ If you have an existing database with the old structure, use these scripts in or
    - Inserts 10 sample mood logs demonstrating varied patterns
    - Transaction-safe and re-runnable
 
+9. **020_minddb_views.sql** - Creates 8 analytical views for reporting:
+   - `weekly_mood_avg_by_pseudonym` - Weekly mood trends per user
+   - `mood_tag_counts` - Emotional state frequency analysis
+   - `helpline_usage_daily` - Crisis resource directory
+   - `user_activity_summary` - Comprehensive engagement metrics
+   - `mood_trend_last_30_days` - Recent mood tracking
+   - `low_mood_alerts` - Mental health intervention alerts
+   - `therapy_session_effectiveness` - Counselor performance metrics
+   - `resource_popularity` - Content engagement tracking
+
 ---
 
 ## How to Execute
@@ -69,6 +79,13 @@ mysql -u root -p -P 3307 mindmate < database/sql/004_normalize_strategies.sql
 # Optional enhancements
 mysql -u root -p -P 3307 mindmate < database/sql/005_create_conversations_table.sql
 mysql -u root -p -P 3307 mindmate < database/sql/006_add_audit_fields.sql
+
+# Mental health tracking features
+mysql -u root -p -P 3307 mindmate < database/sql/010_minddb_schema.sql
+mysql -u root -p -P 3307 mindmate < database/sql/011_seed_anonymized_users.sql
+
+# Analytical views for reporting
+mysql -u root -p -P 3307 mindmate < database/sql/020_minddb_views.sql
 ```
 
 ### Method 2: phpMyAdmin
@@ -104,6 +121,12 @@ After each phase, verify the changes:
 -- Check table structure
 SHOW TABLES;
 
+-- View all tables and views
+SELECT TABLE_NAME, TABLE_TYPE 
+FROM INFORMATION_SCHEMA.TABLES 
+WHERE TABLE_SCHEMA = 'mindmate' 
+ORDER BY TABLE_TYPE, TABLE_NAME;
+
 -- View foreign keys
 SELECT 
     TABLE_NAME,
@@ -115,14 +138,28 @@ FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE
 WHERE TABLE_SCHEMA = 'mindmate'
 AND REFERENCED_TABLE_NAME IS NOT NULL;
 
--- Count records in new tables
+-- Count records in tables
 SELECT 'users' as table_name, COUNT(*) as count FROM users
 UNION ALL
 SELECT 'strategies', COUNT(*) FROM strategies
 UNION ALL
 SELECT 'conversations', COUNT(*) FROM conversations
 UNION ALL
-SELECT 'messages', COUNT(*) FROM messages;
+SELECT 'messages', COUNT(*) FROM messages
+UNION ALL
+SELECT 'anonymized_users', COUNT(*) FROM anonymized_users
+UNION ALL
+SELECT 'mood_logs', COUNT(*) FROM mood_logs
+UNION ALL
+SELECT 'helplines', COUNT(*) FROM helplines
+UNION ALL
+SELECT 'resources', COUNT(*) FROM resources;
+
+-- Test analytical views
+SELECT COUNT(*) as mood_weeks FROM weekly_mood_avg_by_pseudonym;
+SELECT COUNT(*) as unique_tags FROM mood_tag_counts;
+SELECT COUNT(*) as active_users FROM user_activity_summary WHERE total_mood_logs > 0;
+SELECT COUNT(*) as users_needing_support FROM low_mood_alerts;
 ```
 
 ## Rollback Instructions
@@ -165,6 +202,9 @@ mysql -u root -p -P 3307 mindmate < backup_before_normalization.sql
 
 For detailed analysis and recommendations, see:
 - `docs/erd_current.md` - Complete ERD analysis and normalization guide
+- `ANALYTICS_VIEWS_CREATED.md` - Analytical views documentation with usage examples
+- `DATABASE_SETUP_COMPLETE.md` - PHP usage examples and verification
+- `MOOD_TRACKING_SEEDED.md` - Sample data documentation
 - `analyze_db.php` - Database structure analysis script
 - `db_structure.json` - Raw database structure data
 
