@@ -34,6 +34,21 @@ If you have an existing database with the old structure, use these scripts in or
 5. **005_create_conversations_table.sql** - Adds conversation threading support
 6. **006_add_audit_fields.sql** - Adds audit trail and soft delete functionality
 
+### Additional Features
+7. **010_minddb_schema.sql** - Adds privacy and wellness tracking tables:
+   - `anonymized_users` - Pseudonymized identities for privacy
+   - `mood_logs` - Emotional wellbeing tracking
+   - `helplines` - Crisis support resources (7 samples)
+   - `therapy_sessions` - Counseling session records
+   - `resources` - Educational materials (8 samples)
+
+8. **011_seed_anonymized_users.sql** - Populates test data (idempotent):
+   - Creates pseudonyms for all existing users
+   - Inserts 10 sample mood logs demonstrating varied patterns
+   - Transaction-safe and re-runnable
+
+---
+
 ## How to Execute
 
 ### Method 1: Command Line (Recommended)
