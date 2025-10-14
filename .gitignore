@@ -1,0 +1,46 @@
+# MindDB .gitignore
+
+# Database exports (may contain sensitive data)
+exports/*.csv
+exports/*.xlsx
+exports/*.json
+
+# Keep directory structure
+!exports/.gitkeep
+
+# Configuration files with credentials
+config.php
+.env
+
+# Database backups
+*.sql.gz
+*.sql.zip
+backup_*.sql
+
+# Logs
+logs/*.log
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# PHP cache
+vendor/
+composer.phar
+composer.lock
+
+# Node modules (if using npm)
+node_modules/
+package-lock.json
