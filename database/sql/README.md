@@ -57,6 +57,18 @@ If you have an existing database with the old structure, use these scripts in or
    - `therapy_session_effectiveness` - Counselor performance metrics
    - `resource_popularity` - Content engagement tracking
 
+10. **030_minddb_indexes.sql** - Adds 9 performance optimization indexes:
+   - `resources.idx_active_featured` - Featured resources composite
+   - `resources.idx_view_count` - Popularity sorting
+   - `anonymized_users.idx_user_id` - Privacy layer lookup
+   - `helplines.idx_country` - Geographic filtering
+   - `users.idx_email` - Email-based authentication
+   - `users.idx_role` - Role-based filtering
+   - `conversations.idx_user_last_message` - Recent conversations
+   - `messages.idx_conv_created` - Message threading
+   - `strategies.idx_is_active` - Active strategy filtering
+   - Note: Verifies existing indexes from 10_minddb_schema.sql
+
 ---
 
 ## How to Execute
@@ -86,6 +98,9 @@ mysql -u root -p -P 3307 mindmate < database/sql/011_seed_anonymized_users.sql
 
 # Analytical views for reporting
 mysql -u root -p -P 3307 mindmate < database/sql/020_minddb_views.sql
+
+# Performance optimization indexes
+mysql -u root -p -P 3307 mindmate < database/sql/030_minddb_indexes.sql
 ```
 
 ### Method 2: phpMyAdmin
@@ -160,6 +175,14 @@ SELECT COUNT(*) as mood_weeks FROM weekly_mood_avg_by_pseudonym;
 SELECT COUNT(*) as unique_tags FROM mood_tag_counts;
 SELECT COUNT(*) as active_users FROM user_activity_summary WHERE total_mood_logs > 0;
 SELECT COUNT(*) as users_needing_support FROM low_mood_alerts;
+
+-- Verify performance indexes
+SELECT TABLE_NAME, COUNT(DISTINCT INDEX_NAME) as index_count
+FROM INFORMATION_SCHEMA.STATISTICS
+WHERE TABLE_SCHEMA = 'mindmate'
+AND TABLE_NAME IN ('mood_logs', 'therapy_sessions', 'resources', 'users', 'messages')
+GROUP BY TABLE_NAME
+ORDER BY index_count DESC;
 ```
 
 ## Rollback Instructions
@@ -203,6 +226,7 @@ mysql -u root -p -P 3307 mindmate < backup_before_normalization.sql
 For detailed analysis and recommendations, see:
 - `docs/erd_current.md` - Complete ERD analysis and normalization guide
 - `ANALYTICS_VIEWS_CREATED.md` - Analytical views documentation with usage examples
+- `DATABASE_INDEXES_CREATED.md` - Performance index documentation
 - `DATABASE_SETUP_COMPLETE.md` - PHP usage examples and verification
 - `MOOD_TRACKING_SEEDED.md` - Sample data documentation
 - `analyze_db.php` - Database structure analysis script
