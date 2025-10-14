@@ -69,6 +69,14 @@ If you have an existing database with the old structure, use these scripts in or
    - `strategies.idx_is_active` - Active strategy filtering
    - Note: Verifies existing indexes from 10_minddb_schema.sql
 
+11. **040_minddb_procedures_triggers.sql** - Creates stored procedures and audit triggers:
+   - `sp_get_weekly_summary(week_start, week_end)` - Weekly mood reports
+   - `mood_logs_audit` - Audit trail table with 4 indexes
+   - `trg_mood_logs_before_insert` - Auto-audit on INSERT
+   - `trg_mood_logs_after_insert` - Update audit with actual ID
+   - `trg_mood_logs_before_update` - Auto-audit on UPDATE
+   - `trg_mood_logs_before_delete` - Auto-audit on DELETE
+
 ---
 
 ## How to Execute
@@ -101,6 +109,9 @@ mysql -u root -p -P 3307 mindmate < database/sql/020_minddb_views.sql
 
 # Performance optimization indexes
 mysql -u root -p -P 3307 mindmate < database/sql/030_minddb_indexes.sql
+
+# Stored procedures and audit triggers
+mysql -u root -p -P 3307 mindmate < database/sql/040_minddb_procedures_triggers.sql
 ```
 
 ### Method 2: phpMyAdmin
@@ -176,6 +187,14 @@ SELECT COUNT(*) as unique_tags FROM mood_tag_counts;
 SELECT COUNT(*) as active_users FROM user_activity_summary WHERE total_mood_logs > 0;
 SELECT COUNT(*) as users_needing_support FROM low_mood_alerts;
 
+-- Verify stored procedures and triggers
+SHOW PROCEDURE STATUS WHERE Db = 'mindmate';
+SHOW TRIGGERS FROM mindmate WHERE `Trigger` LIKE 'trg_mood_logs%';
+SELECT COUNT(*) as audit_records FROM mood_logs_audit;
+
+-- Test stored procedure
+CALL sp_get_weekly_summary(DATE_SUB(CURDATE(), INTERVAL 7 DAY), CURDATE());
+
 -- Verify performance indexes
 SELECT TABLE_NAME, COUNT(DISTINCT INDEX_NAME) as index_count
 FROM INFORMATION_SCHEMA.STATISTICS
@@ -227,6 +246,7 @@ For detailed analysis and recommendations, see:
 - `docs/erd_current.md` - Complete ERD analysis and normalization guide
 - `ANALYTICS_VIEWS_CREATED.md` - Analytical views documentation with usage examples
 - `DATABASE_INDEXES_CREATED.md` - Performance index documentation
+- `PROCEDURES_TRIGGERS_CREATED.md` - Stored procedures and triggers documentation
 - `DATABASE_SETUP_COMPLETE.md` - PHP usage examples and verification
 - `MOOD_TRACKING_SEEDED.md` - Sample data documentation
 - `analyze_db.php` - Database structure analysis script
