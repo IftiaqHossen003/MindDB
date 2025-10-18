@@ -1,0 +1,22 @@
+# MindDB .htaccess - Security and Routing Rules
+
+# Prevent direct access to view files
+<Files "*.php">
+    <RequireAll>
+        Require all denied
+    </RequireAll>
+</Files>
+
+# Allow access only to router files
+<Files "index.php">
+    Require all granted
+</Files>
+
+# Redirect common view paths to router
+RewriteEngine On
+
+# Redirect journal view access to router
+RewriteRule ^create\.php$ /MindDB/public/journal_create.php [R=301,L]
+RewriteRule ^index\.php$ /MindDB/public/journal.php [R=301,L]
+RewriteRule ^edit\.php$ /MindDB/public/journal.php?action=edit [R=301,L]
+RewriteRule ^show\.php$ /MindDB/public/journal.php?action=show [R=301,L]

@@ -77,6 +77,17 @@ If you have an existing database with the old structure, use these scripts in or
    - `trg_mood_logs_before_update` - Auto-audit on UPDATE
    - `trg_mood_logs_before_delete` - Auto-audit on DELETE
 
+12. **050_create_restricted_views.sql** - Creates 8 restricted aggregate views for counselor access:
+   - `view_weekly_trends` - Weekly mood trends (no user IDs)
+   - `view_aggregate_journals` - Daily journal statistics (no content)
+   - `view_mood_distribution` - Mood level frequency histogram
+   - `view_therapy_effectiveness` - Session metrics (no counselor names)
+   - `view_resource_engagement` - Resource usage statistics
+   - `view_monthly_summary` - Monthly platform summary
+   - `view_tag_frequency` - Tag usage analysis (no user associations)
+   - `view_activity_metrics` - Engagement metrics (aggregated)
+   - Note: NO PII exposure - safe for counselor_view role
+
 ---
 
 ## How to Execute
@@ -112,6 +123,9 @@ mysql -u root -p -P 3307 mindmate < database/sql/030_minddb_indexes.sql
 
 # Stored procedures and audit triggers
 mysql -u root -p -P 3307 mindmate < database/sql/040_minddb_procedures_triggers.sql
+
+# Restricted aggregate views for counselor access
+mysql -u root -p -P 3307 mindmate < database/sql/050_create_restricted_views.sql
 ```
 
 ### Method 2: phpMyAdmin
